@@ -3,30 +3,155 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TikTok Publisher Helper</title>
+    <title>KnowGrow Creator Studio | Prepare and publish TikTok videos</title>
     <meta
       name="description"
-      content="Legal information for a private video editing and TikTok content publishing helper."
+      content="KnowGrow Creator Studio helps independent creators and small businesses prepare, review, and publish videos to their own TikTok accounts with explicit approval."
     />
+    <meta name="theme-color" content="#f6f4ef" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="page">
-      <p class="eyebrow">TikTok Publisher Helper</p>
-      <h1>Video editing and publishing support for TikTok creators</h1>
-      <p class="lead">
-        This site hosts the Terms of Service and Privacy Policy for a private workflow
-        that prepares creator-approved videos and submits them to TikTok through official
-        TikTok developer integrations.
-      </p>
-      <nav class="links" aria-label="Legal pages">
-        <a href="./demo/">API Review Demo</a>
-        <a href="./terms/">Terms of Service</a>
-        <a href="./privacy/">Privacy Policy</a>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="KnowGrow Creator Studio home">
+        <span class="brand-mark">K</span>
+        <span>KnowGrow <small>Creator Studio</small></span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="./support/">Support</a>
+        <a class="button button-small" href="./app/">Open studio</a>
       </nav>
-      <p class="note">
-        The workflow does not publish content without explicit creator approval.
-      </p>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Creator-controlled publishing</p>
+          <h1>Prepare once.<br />Review everything.<br /><em>Publish with confidence.</em></h1>
+          <p class="lead">
+            KnowGrow Creator Studio is a public web application for independent creators
+            and small businesses. Prepare a TikTok-ready video, review every publishing
+            setting, connect your own account, and approve each post yourself.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="./app/">Prepare a video</a>
+            <a class="text-link" href="#how-it-works">See how it works <span>→</span></a>
+          </div>
+          <ul class="trust-list" aria-label="Product safeguards">
+            <li>No automatic posting</li>
+            <li>Your TikTok authorization</li>
+            <li>Review before every post</li>
+          </ul>
+        </div>
+
+        <div class="product-preview" aria-label="KnowGrow workspace preview">
+          <div class="preview-header">
+            <span class="preview-dots"><i></i><i></i><i></i></span>
+            <strong>New TikTok post</strong>
+            <span class="ready-pill">Ready to review</span>
+          </div>
+          <div class="preview-content">
+            <div class="video-card">
+              <span class="video-ratio">9:16</span>
+              <div class="video-art">
+                <span class="play-icon">▶</span>
+              </div>
+              <strong>creator-video.mp4</strong>
+              <small>1080 × 1920 · H.264</small>
+            </div>
+            <div class="settings-card">
+              <span class="field-label">Caption</span>
+              <p>A small moment worth sharing. #CreatorTips</p>
+              <span class="field-label">Visibility</span>
+              <div class="select-preview">Public <span>⌄</span></div>
+              <div class="setting-row"><span>Comments</span><b>On</b></div>
+              <div class="setting-row"><span>Duet</span><b>Off</b></div>
+              <div class="setting-row"><span>Stitch</span><b>Off</b></div>
+              <div class="review-bar"><span>Review complete</span><strong>3 / 3</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="features">
+        <div class="section-heading">
+          <p class="eyebrow">Everything before publish</p>
+          <h2>A clear workflow, with the creator in control.</h2>
+          <p>Know what will be posted and which account will receive it before any upload begins.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="feature-number">01</span>
+            <h3>Local video preview</h3>
+            <p>Select and inspect your video in the browser. Confirm file type, size, duration, and framing before continuing.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-number">02</span>
+            <h3>Publishing settings</h3>
+            <p>Review the caption, privacy level, comments, Duet, Stitch, branded-content, and AI-generated-content settings.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-number">03</span>
+            <h3>Official TikTok OAuth</h3>
+            <p>Connect your own TikTok account through TikTok's authorization page. KnowGrow never asks for your TikTok password.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-number">04</span>
+            <h3>Explicit final approval</h3>
+            <p>Nothing is published automatically. A creator must review and confirm each post before the official upload flow starts.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section process-section" id="how-it-works">
+        <div class="section-heading compact">
+          <p class="eyebrow">How it works</p>
+          <h2>Four deliberate steps.</h2>
+        </div>
+        <ol class="process-list">
+          <li><span>1</span><div><strong>Select your video</strong><p>Choose content you own or have permission to publish.</p></div></li>
+          <li><span>2</span><div><strong>Complete the review</strong><p>Check the preview, caption, privacy, and interaction controls.</p></div></li>
+          <li><span>3</span><div><strong>Connect TikTok</strong><p>Authorize the requested scopes on TikTok's official OAuth screen.</p></div></li>
+          <li><span>4</span><div><strong>Confirm the post</strong><p>Approve the final settings and follow the publishing status.</p></div></li>
+        </ol>
+      </section>
+
+      <section class="section safety-section" id="security">
+        <div>
+          <p class="eyebrow">Designed around consent</p>
+          <h2>Your content. Your account. Your decision.</h2>
+        </div>
+        <div class="safety-grid">
+          <p><strong>Minimum access</strong><br />Only the TikTok permissions needed for the requested feature are requested.</p>
+          <p><strong>No password collection</strong><br />Account authorization happens on TikTok, not inside KnowGrow.</p>
+          <p><strong>Creator responsibility</strong><br />You retain responsibility for content rights and the settings you approve.</p>
+          <p><strong>Revocable access</strong><br />TikTok authorization can be revoked through your TikTok account controls.</p>
+        </div>
+      </section>
+
+      <section class="cta-section">
+        <div>
+          <p class="eyebrow">Start with a local preview</p>
+          <h2>Prepare your next TikTok post.</h2>
+          <p>The studio checks your video and publishing settings before you connect an account.</p>
+        </div>
+        <a class="button button-light" href="./app/">Open Creator Studio</a>
+      </section>
     </main>
+
+    <footer class="site-footer">
+      <div class="brand footer-brand"><span class="brand-mark">K</span><span>KnowGrow <small>Creator Studio</small></span></div>
+      <div class="footer-links">
+        <a href="./app/">Studio</a>
+        <a href="./support/">Support</a>
+        <a href="./terms/">Terms</a>
+        <a href="./privacy/">Privacy</a>
+        <a href="./data-deletion/">Data deletion</a>
+      </div>
+      <p>© 2026 KnowGrow Creator Studio. Not affiliated with or endorsed by TikTok.</p>
+    </footer>
   </body>
 </html>

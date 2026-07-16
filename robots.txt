@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://huangchengde.github.io/tiktok-publisher-legal/sitemap.xml

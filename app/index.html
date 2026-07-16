@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Creator Studio | KnowGrow</title>
+    <meta name="description" content="Prepare, validate, and review a TikTok video before connecting your account and publishing." />
+    <meta name="theme-color" content="#f6f4ef" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="../"><span class="brand-mark">K</span><span>KnowGrow <small>Creator Studio</small></span></a>
+      <nav class="site-nav" aria-label="Studio navigation">
+        <a href="../#how-it-works">How it works</a>
+        <a href="../support/">Support</a>
+        <a class="button button-small button-secondary" href="https://tiktok-content-api.onrender.com/tiktok/oauth/start" rel="external">Connect TikTok</a>
+      </nav>
+    </header>
+
+    <main class="page page-wide">
+      <p class="eyebrow">Creator workspace</p>
+      <h1>Prepare a TikTok post</h1>
+      <p class="lead">Select a video, review its publishing settings, and run a pre-publish check. Your video stays in this browser during preparation.</p>
+      <noscript><p class="noscript">JavaScript is required to preview and validate a local video.</p></noscript>
+
+      <div class="studio-layout">
+        <section class="panel" aria-labelledby="video-panel-title">
+          <div class="panel-header">
+            <h2 id="video-panel-title">Video</h2>
+            <span class="step-pill">Step 1 of 3</span>
+          </div>
+          <div class="panel-body">
+            <label class="drop-zone" id="dropZone" for="videoFile">
+              <input id="videoFile" type="file" accept="video/mp4,video/quicktime,video/webm" />
+              <span>
+                <span class="upload-icon">＋</span>
+                <strong>Select a video</strong>
+                <p>MP4, MOV, or WebM · up to 4 GB</p>
+                <span class="button button-small">Choose file</span>
+              </span>
+            </label>
+
+            <div class="file-summary" id="fileSummary">
+              <video class="video-preview" id="videoPreview" controls playsinline></video>
+              <div class="file-meta">
+                <div class="meta-item"><span>File</span><strong id="fileName">—</strong></div>
+                <div class="meta-item"><span>Size</span><strong id="fileSize">—</strong></div>
+                <div class="meta-item"><span>Duration</span><strong id="fileDuration">—</strong></div>
+                <div class="meta-item"><span>Frame</span><strong id="fileFrame">—</strong></div>
+              </div>
+              <div class="action-stack">
+                <button class="button button-small button-secondary" id="replaceVideo" type="button">Replace video</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="settings-panel-title">
+          <div class="panel-header">
+            <h2 id="settings-panel-title">Post settings</h2>
+            <span class="step-pill">Steps 2–3</span>
+          </div>
+          <div class="panel-body">
+            <form id="postForm">
+              <div class="form-grid">
+                <label class="field field-full">
+                  <span>Caption</span>
+                  <textarea id="caption" maxlength="2200" required placeholder="Write a clear caption and relevant hashtags"></textarea>
+                  <div class="character-count"><span id="captionCount">0</span> / 2200</div>
+                </label>
+                <label class="field">
+                  <span>Visibility</span>
+                  <select id="privacyLevel">
+                    <option value="SELF_ONLY">Only me</option>
+                    <option value="MUTUAL_FOLLOW_FRIENDS">Friends</option>
+                    <option value="PUBLIC_TO_EVERYONE">Public</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Cover timestamp (seconds)</span>
+                  <input id="coverTimestamp" type="number" min="0" step="0.1" value="1" />
+                </label>
+
+                <div class="toggle-grid">
+                  <label class="toggle-card"><span>Allow comments</span><input id="allowComment" type="checkbox" checked /></label>
+                  <label class="toggle-card"><span>Allow Duet</span><input id="allowDuet" type="checkbox" /></label>
+                  <label class="toggle-card"><span>Allow Stitch</span><input id="allowStitch" type="checkbox" /></label>
+                  <label class="toggle-card"><span>AI-generated content</span><input id="isAigc" type="checkbox" /></label>
+                </div>
+              </div>
+
+              <ul class="checklist" aria-label="Publication checklist">
+                <li id="checkVideo">A supported video has been selected</li>
+                <li id="checkCaption">A caption has been reviewed</li>
+                <li id="checkValidation">Publishing settings passed validation</li>
+              </ul>
+
+              <div class="action-stack">
+                <button class="button" id="validateButton" type="submit" disabled>Run publication check</button>
+                <a class="button button-secondary" id="connectButton" href="https://tiktok-content-api.onrender.com/tiktok/oauth/start" rel="external">Connect TikTok</a>
+              </div>
+              <div class="status-box" id="statusBox" role="status" aria-live="polite">
+                <strong>Waiting for a video</strong>
+                Select a video to begin the review.
+              </div>
+              <p class="privacy-note">The selected video is previewed locally. The publication check sends file metadata and post settings to KnowGrow, not the video file. TikTok account connection uses TikTok's official authorization page.</p>
+            </form>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="brand footer-brand"><span class="brand-mark">K</span><span>KnowGrow <small>Creator Studio</small></span></div>
+      <div class="footer-links"><a href="../support/">Support</a><a href="../terms/">Terms</a><a href="../privacy/">Privacy</a><a href="../data-deletion/">Data deletion</a></div>
+      <p>© 2026 KnowGrow Creator Studio. Not affiliated with or endorsed by TikTok.</p>
+    </footer>
+    <script src="./studio.js" defer></script>
+  </body>
+</html>
