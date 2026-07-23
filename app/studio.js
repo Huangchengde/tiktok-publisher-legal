@@ -55,6 +55,15 @@
     return `${minutes}:${remaining}`;
   };
 
+  const uploadPlan = (videoSize) => {
+    const chunkSize = Math.min(CHUNK_SIZE, videoSize);
+    return {
+      videoSize,
+      chunkSize,
+      totalChunkCount: Math.max(1, Math.floor(videoSize / chunkSize)),
+    };
+  };
+
   const setStatus = (title, message, type = "") => {
     elements.statusBox.className = `status-box${type ? ` ${type}` : ""}`;
     elements.statusBox.innerHTML = "";
@@ -136,16 +145,16 @@
     event.preventDefault();
     if (!selectedFile || !elements.caption.value.trim()) return;
 
-    const chunkSize = Math.min(CHUNK_SIZE, selectedFile.size);
+    const plan = uploadPlan(selectedFile.size);
     const payload = {
       title: elements.caption.value.trim(),
       privacy_level: elements.privacyLevel.value,
       disable_duet: !elements.allowDuet.checked,
       disable_comment: !elements.allowComment.checked,
       disable_stitch: !elements.allowStitch.checked,
-      video_size: selectedFile.size,
-      chunk_size: chunkSize,
-      total_chunk_count: Math.ceil(selectedFile.size / chunkSize),
+      video_size: plan.videoSize,
+      chunk_size: plan.chunkSize,
+      total_chunk_count: plan.totalChunkCount,
       video_cover_timestamp_ms: Math.max(0, Math.round(Number(elements.coverTimestamp.value || 0) * 1000)),
       is_aigc: elements.isAigc.checked,
     };
@@ -192,19 +201,21 @@
   };
 
   const sourceInfo = () => {
-    const chunkSize = Math.min(CHUNK_SIZE, selectedFile.size);
+    const plan = uploadPlan(selectedFile.size);
     return {
       source: "FILE_UPLOAD",
-      video_size: selectedFile.size,
-      chunk_size: chunkSize,
-      total_chunk_count: Math.ceil(selectedFile.size / chunkSize),
+      video_size: plan.videoSize,
+      chunk_size: plan.chunkSize,
+      total_chunk_count: plan.totalChunkCount,
     };
   };
 
   const uploadChunks = async (uploadUrl) => {
+    const plan = uploadPlan(selectedFile.size);
     let start = 0;
-    while (start < selectedFile.size) {
-      const end = Math.min(start + CHUNK_SIZE, selectedFile.size);
+    for (let chunkIndex = 0; chunkIndex < plan.totalChunkCount; chunkIndex += 1) {
+      const isLastChunk = chunkIndex === plan.totalChunkCount - 1;
+      const end = isLastChunk ? selectedFile.size : start + plan.chunkSize;
       const chunk = selectedFile.slice(start, end, selectedFile.type || "video/mp4");
       const response = await fetch(uploadUrl, {
         method: "PUT",
