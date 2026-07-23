@@ -5,3 +5,16 @@ services:
     buildCommand: echo "Static site ready"
     staticPublishPath: .
     autoDeployTrigger: commit
+    routes:
+      - type: rewrite
+        source: /privacy/*
+        destination: /privacy/index.html
+      - type: rewrite
+        source: /terms/*
+        destination: /terms/index.html
+      - type: rewrite
+        source: /support/*
+        destination: /support/index.html
+      - type: rewrite
+        source: /data-deletion/*
+        destination: /data-deletion/index.html
