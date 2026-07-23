@@ -26,6 +26,10 @@
     allowStitch: document.querySelector("#allowStitch"),
     isAigc: document.querySelector("#isAigc"),
     validateButton: document.querySelector("#validateButton"),
+    connectButton: document.querySelector("#connectButton"),
+    creatorButton: document.querySelector("#creatorButton"),
+    uploadButton: document.querySelector("#uploadButton"),
+    publishButton: document.querySelector("#publishButton"),
     checkVideo: document.querySelector("#checkVideo"),
     checkCaption: document.querySelector("#checkCaption"),
     checkValidation: document.querySelector("#checkValidation"),
@@ -34,6 +38,8 @@
 
   let selectedFile = null;
   let objectUrl = null;
+  let publicationChecked = false;
+  let creatorReady = false;
 
   const formatBytes = (bytes) => {
     if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
@@ -64,7 +70,10 @@
   };
 
   const resetValidation = () => {
+    publicationChecked = false;
     elements.checkValidation.classList.remove("done");
+    elements.uploadButton.disabled = true;
+    elements.publishButton.disabled = true;
     if (selectedFile) setStatus("Ready for review", "Complete the caption and run the publication check.");
   };
 
@@ -152,6 +161,9 @@
       const result = await response.json();
       if (!response.ok || !result.ok) throw new Error(result.detail || "The publication check failed.");
       elements.checkValidation.classList.add("done");
+      publicationChecked = true;
+      elements.uploadButton.disabled = !creatorReady;
+      elements.publishButton.disabled = !creatorReady;
       const warning = result.warnings?.length ? ` ${result.warnings.join(" ")}` : "";
       setStatus("Publication check passed", `Your video metadata and settings are ready. Connect your TikTok account to continue.${warning}`, "success");
     } catch (error) {
@@ -160,6 +172,140 @@
       syncChecklist();
     }
   });
+
+  const requestJson = async (path, options = {}) => {
+    const response = await fetch(`${API_BASE}${path}`, {
+      credentials: "include",
+      ...options,
+      headers: {
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...(options.headers || {}),
+      },
+    });
+    const result = await response.json();
+    if (!response.ok || result.error?.code) {
+      throw new Error(result.detail || result.error?.message || result.error || "TikTok API request failed.");
+    }
+    return result;
+  };
+
+  const sourceInfo = () => {
+    const chunkSize = Math.min(CHUNK_SIZE, selectedFile.size);
+    return {
+      source: "FILE_UPLOAD",
+      video_size: selectedFile.size,
+      chunk_size: chunkSize,
+      total_chunk_count: Math.ceil(selectedFile.size / chunkSize),
+    };
+  };
+
+  const uploadChunks = async (uploadUrl) => {
+    let start = 0;
+    while (start < selectedFile.size) {
+      const end = Math.min(start + CHUNK_SIZE, selectedFile.size);
+      const chunk = selectedFile.slice(start, end, selectedFile.type || "video/mp4");
+      const response = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": selectedFile.type || "video/mp4",
+          "Content-Length": String(chunk.size),
+          "Content-Range": `bytes ${start}-${end - 1}/${selectedFile.size}`,
+        },
+        body: chunk,
+      });
+      if (!response.ok) throw new Error(`Video transfer failed (${response.status}).`);
+      start = end;
+    }
+  };
+
+  const pollStatus = async (publishId) => {
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      const result = await requestJson("/tiktok/publish/status/fetch", {
+        method: "POST",
+        body: JSON.stringify({ publish_id: publishId }),
+      });
+      const status = result.data?.status || "PROCESSING";
+      setStatus("TikTok is processing the video", `Publish ID: ${publishId} · Status: ${status}`);
+      if (!["PROCESSING", "SEND_TO_USER_INBOX"].includes(status)) return status;
+      await new Promise((resolve) => window.setTimeout(resolve, 1500));
+    }
+    return "PROCESSING";
+  };
+
+  elements.creatorButton.addEventListener("click", async () => {
+    setStatus("Reading creator information", "Querying the authorized TikTok account and available publishing settings…");
+    try {
+      const result = await requestJson("/tiktok/creator-info");
+      const creator = result.data || {};
+      creatorReady = true;
+      elements.uploadButton.disabled = !publicationChecked;
+      elements.publishButton.disabled = !publicationChecked;
+      setStatus(
+        "Creator information received",
+        `${creator.creator_nickname || "Authorized creator"} · Publishing settings are available.`,
+        "success",
+      );
+    } catch (error) {
+      setStatus("Creator information unavailable", error.message, "error");
+    }
+  });
+
+  const sendVideo = async (mode) => {
+    if (!selectedFile || !publicationChecked || !creatorReady) return;
+    const isDraft = mode === "draft";
+    const initPath = isDraft ? "/tiktok/upload/video/init" : "/tiktok/publish/video/init";
+    const payload = isDraft
+      ? { source_info: sourceInfo() }
+      : {
+          post_info: {
+            title: elements.caption.value.trim(),
+            privacy_level: elements.privacyLevel.value,
+            disable_duet: !elements.allowDuet.checked,
+            disable_comment: !elements.allowComment.checked,
+            disable_stitch: !elements.allowStitch.checked,
+            video_cover_timestamp_ms: Math.max(0, Math.round(Number(elements.coverTimestamp.value || 0) * 1000)),
+            is_aigc: elements.isAigc.checked,
+          },
+          source_info: sourceInfo(),
+        };
+
+    elements.uploadButton.disabled = true;
+    elements.publishButton.disabled = true;
+    setStatus(isDraft ? "Initializing TikTok draft upload" : "Initializing TikTok direct post", "Requesting a secure upload URL…");
+    try {
+      const result = await requestJson(initPath, { method: "POST", body: JSON.stringify(payload) });
+      const uploadUrl = result.data?.upload_url;
+      const publishId = result.data?.publish_id;
+      if (!uploadUrl || !publishId) throw new Error("TikTok did not return an upload URL.");
+      setStatus("Uploading video to TikTok", `Publish ID: ${publishId}`);
+      await uploadChunks(uploadUrl);
+      const finalStatus = await pollStatus(publishId);
+      setStatus(
+        isDraft ? "TikTok draft upload completed" : "TikTok publication submitted",
+        `Publish ID: ${publishId} · Status: ${finalStatus}`,
+        "success",
+      );
+    } catch (error) {
+      setStatus(isDraft ? "Draft upload failed" : "Publication failed", error.message, "error");
+    } finally {
+      elements.uploadButton.disabled = !publicationChecked || !creatorReady;
+      elements.publishButton.disabled = !publicationChecked || !creatorReady;
+    }
+  };
+
+  elements.uploadButton.addEventListener("click", () => sendVideo("draft"));
+  elements.publishButton.addEventListener("click", () => sendVideo("publish"));
+
+  if (new URLSearchParams(window.location.search).get("connected") === "1") {
+    elements.connectButton.hidden = true;
+    elements.creatorButton.hidden = false;
+    elements.uploadButton.hidden = false;
+    elements.publishButton.hidden = false;
+    elements.uploadButton.disabled = true;
+    elements.publishButton.disabled = true;
+    setStatus("TikTok account connected", "Read creator information, then upload a draft or publish after the publication check.", "success");
+    window.history.replaceState({}, "", window.location.pathname);
+  }
 
   fetch(`${API_BASE}/healthz`, { mode: "cors" }).catch(() => {
     setStatus("Service connection unavailable", "The preparation service could not be reached. You can still preview your local video.", "error");
