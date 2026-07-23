@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: knowgrow-creator-studio
+    runtime: static
+    buildCommand: echo "Static site ready"
+    staticPublishPath: .
+    autoDeployTrigger: commit
