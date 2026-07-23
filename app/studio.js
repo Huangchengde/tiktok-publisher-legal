@@ -183,8 +183,10 @@
       },
     });
     const result = await response.json();
-    if (!response.ok || result.error?.code) {
-      throw new Error(result.detail || result.error?.message || result.error || "TikTok API request failed.");
+    if (!response.ok || (result.error?.code && result.error.code !== "ok")) {
+      const detail = typeof result.detail === "string" ? result.detail : "";
+      const apiMessage = typeof result.error?.message === "string" ? result.error.message : "";
+      throw new Error(detail || apiMessage || "TikTok API request failed.");
     }
     return result;
   };
