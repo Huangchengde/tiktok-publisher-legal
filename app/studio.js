@@ -19,7 +19,9 @@
     const res = await fetch(API + path, {credentials: 'include', ...(payload ? {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)} : {})});
     const result = await res.json();
     if (!res.ok || (result.error?.code && result.error.code !== 'ok')) {
-      throw new Error(typeof result.detail === 'string' ? result.detail : result.error?.message || 'Request failed. Reconnect or try again later.');
+      const error = new Error(typeof result.detail === 'string' ? result.detail : result.error?.message || 'Request failed. Reconnect or try again later.');
+      error.initRejected = res.status >= 400 && res.status < 500 && !!result.error?.code && !result.data?.publish_id;
+      throw error;
     }
     return result;
   };
@@ -65,7 +67,7 @@
     $('consent').disabled = busy;
     $('refreshStatus').hidden = !receipt;
     $('refreshStatus').disabled = busy;
-    $('newPost').hidden = !receipt || !['PUBLISH_COMPLETE', 'FAILED', 'SEND_TO_USER_INBOX'].includes(receipt.status);
+    $('newPost').hidden = !receipt || !['PUBLISH_COMPLETE', 'FAILED', 'REJECTED', 'SEND_TO_USER_INBOX'].includes(receipt.status);
   };
   const invalidate = () => { checked = false; $('consent').checked = false; render(); };
   const loadCreator = async () => {
@@ -133,6 +135,7 @@
     const suffix = `Reference: ${receipt.publishId || receipt.requestId}.`;
     if (receipt.status === 'PUBLISH_COMPLETE') status('TikTok confirmed publication', `${suffix} It may take a few minutes to appear on your profile. Open TikTok to view the actual post.`, 'success');
     else if (receipt.status === 'SEND_TO_USER_INBOX' && receipt.mode === 'draft') status('Delivered to TikTok Inbox', `${suffix} Open the TikTok Inbox notification to finish editing and publish.`, 'success');
+    else if (receipt.status === 'REJECTED') status('TikTok rejected initialization', `${receipt.reason || ''} ${suffix} No video was uploaded.`, 'error');
     else if (receipt.status === 'FAILED') status('TikTok reported a failure', `${receipt.reason || ''} ${suffix} No automatic retry was made.`, 'error');
     else status('Posting result pending', `${suffix} ${receipt.status || 'Response not confirmed'}. Refresh the status; do not submit this video again.`);
   };
@@ -147,7 +150,8 @@
   const send = async () => {
     if (busy || receipt || !checked || !valid() || !$('consent').checked) return;
     const selected = file, mode = draft() ? 'draft' : 'publish';
-    const chunkSize = Math.min(10 * 1024 ** 2, selected.size), count = Math.max(1, Math.floor(selected.size / chunkSize));
+    const chunkSize = selected.size <= 64_000_000 ? selected.size : 10_000_000;
+    const count = Math.max(1, Math.floor(selected.size / chunkSize));
     const payload = {expected_creator: creator.creator_username || creator.creator_nickname, request_id: crypto.randomUUID(), consent: true, video_duration_sec: duration,
       source_info: {source: 'FILE_UPLOAD', video_size: selected.size, chunk_size: chunkSize, total_chunk_count: count}};
     if (mode === 'publish') payload.post_info = {title: $('caption').value.trim(), privacy_level: $('privacyLevel').value,
@@ -172,7 +176,8 @@
       for (let i = 0; i < 8; i++) { if (await refreshStatus()) break; await new Promise(resolve => setTimeout(resolve, 3000)); }
       showReceipt();
     } catch (error) {
-      receipt.status = 'UNKNOWN'; saveReceipt();
+      receipt.status = error.initRejected && !receipt.publishId ? 'REJECTED' : 'UNKNOWN'; receipt.reason = error.message; saveReceipt();
+      if (receipt.status === 'REJECTED') { showReceipt(); return; }
       status('Posting result needs checking', `${error.message} Reference: ${receipt.publishId || receipt.requestId}. No automatic retry will be made.`, 'error');
     } finally { busy = false; checked = false; $('consent').checked = false; render(); }
   };

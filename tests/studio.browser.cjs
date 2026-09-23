@@ -6,7 +6,7 @@ const {chromium} = require('playwright');
 (async () => {
   const browser = await chromium.launch({headless: true, channel: 'chrome'});
   try {
-    for (const width of [390, 1280]) {
+    for (const width of [390, 1280, 640]) {
       const page = await browser.newPage({viewport: {width, height: 900}});
       let posts = 0, statusCalls = 0, platformStatus = width === 390 ? 'FAILED' : 'PROCESSING_DOWNLOAD';
       await page.addInitScript(() => { const timer = window.setTimeout; window.setTimeout = (fn, ms, ...args) => timer(fn, ms === 3000 ? 1 : ms, ...args); });
@@ -17,8 +17,10 @@ const {chromium} = require('playwright');
         if (p === '/tiktok/creator-info') return route.fulfill({json: {data: {creator_nickname: 'Offline Test Creator', privacy_level_options: ['SELF_ONLY', 'PUBLIC_TO_EVERYONE'], max_video_post_duration_sec: 60, comment_disabled: true, duet_disabled: false, stitch_disabled: false}, error: {code: 'ok'}}});
         if (p === '/tiktok/publish/video/init') {
           posts++; const body = route.request().postDataJSON();
+          assert.equal(body.source_info.video_size, 14675418); assert.equal(body.source_info.chunk_size, 14675418); assert.equal(body.source_info.total_chunk_count, 1);
           assert.equal(body.consent, true); assert.equal(body.post_info.brand_content_toggle, true);
           assert.equal(body.post_info.disable_comment, true); assert.equal(body.post_info.privacy_level, 'PUBLIC_TO_EVERYONE');
+          if (width === 640) return route.fulfill({status:400,json:{error:{code:'invalid_param',message:'Rejected fixture'}}});
           return route.fulfill({json: {data: {publish_id: 'offline-publish', upload_url: 'https://fixture.test/upload'}, error: {code: 'ok'}}});
         }
         if (p === '/upload') return route.fulfill({status: 201});
@@ -36,7 +38,7 @@ const {chromium} = require('playwright');
       assert.equal(await page.locator('#commercial').isChecked(), false);
       assert.equal(await page.locator('#brandOptions').isHidden(), true);
       // Simulate local media metadata, not a real recording or platform receipt.
-      await page.locator('#videoFile').setInputFiles({name: 'offline.mp4', mimeType: 'video/mp4', buffer: Buffer.from('offline')});
+      await page.locator('#videoFile').setInputFiles({name: 'offline.mp4', mimeType: 'video/mp4', buffer: Buffer.alloc(14675418)});
       await page.evaluate(() => { const v = document.querySelector('video'); v.removeAttribute('src'); v.load(); Object.defineProperty(v, 'duration', {get: () => 12, configurable: true}); v.dispatchEvent(new Event('loadedmetadata')); });
       await page.locator('#caption').fill('Offline fixture');
       await page.locator('#privacyLevel').selectOption('SELF_ONLY');
@@ -56,6 +58,7 @@ const {chromium} = require('playwright');
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       await page.screenshot({path: `/tmp/knowgrow-web-${width}.png`, fullPage: true});
       await page.locator('#publishButton').click();
+      if (width === 640) { await page.getByText('TikTok rejected initialization', {exact:true}).waitFor(); assert.equal(posts,1); assert.equal(statusCalls,0); assert.equal(await page.locator('#newPost').isVisible(),true); assert.equal(await page.locator('#publishButton').isDisabled(),true); await page.close(); continue; }
       if (width === 390) await page.getByText('TikTok reported a failure', {exact: true}).waitFor();
       else { await page.getByText('Posting result pending', {exact: true}).waitFor(); await page.waitForFunction(() => !document.querySelector('#refreshStatus').disabled); assert.equal(statusCalls, 8); }
       assert.equal(posts, 1); assert.equal(await page.locator('#publishButton').isDisabled(), true);
