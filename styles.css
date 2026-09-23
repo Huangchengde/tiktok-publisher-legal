@@ -244,3 +244,14 @@ h3 { margin-bottom: 9px; font-size: 20px; line-height: 1.25; }
   .field-full { grid-column: auto; }
   .toggle-grid { grid-column: auto; }
 }
+
+[hidden] { display: none !important; }
+.account-panel { margin: 24px 0; }
+.account-panel h2 { font-size: 22px; }
+.disclosure-panel { margin: 20px 0; padding: 16px; background: #f0f1ec; border-radius: 12px; }
+.disclosure-panel p, #draftNotice { font-size: 13px; }
+.consent-row { display: flex; align-items: flex-start; gap: 12px; margin: 20px 0; font-size: 14px; }
+.consent-row input { flex-shrink: 0; width: 20px; height: 20px; }
+input:disabled, select:disabled { opacity: .5; cursor: not-allowed; }
+.toggle-card:has(input:disabled) { color: #777; background: #eee; }
+button:disabled { opacity: .5; cursor: not-allowed; }

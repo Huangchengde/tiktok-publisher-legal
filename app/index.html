@@ -22,9 +22,15 @@
     <main class="page page-wide">
       <p class="eyebrow">Creator workspace</p>
       <h1>Prepare a TikTok post</h1>
-      <p class="lead">Select a video, review its publishing settings, and run a pre-publish check. Your video stays in this browser during preparation.</p>
+      <p class="lead">Connect your TikTok account, preview your video, and choose how to share it. Nothing is uploaded until you confirm.</p>
       <noscript><p class="noscript">JavaScript is required to preview and validate a local video.</p></noscript>
 
+      <section class="panel account-panel" aria-labelledby="accountTitle"><div class="panel-body">
+        <h2 id="accountTitle">TikTok account</h2><p id="creatorIdentity">Connect TikTok to load your account and available publishing settings.</p>
+        <p id="creatorLimits"></p>
+        <a class="button button-secondary" id="connectButton" href="https://tiktok-content-api.onrender.com/tiktok/oauth/start">Connect / switch TikTok account</a>
+        <button class="button button-secondary" id="creatorButton" type="button">Refresh account settings</button>
+      </div></section>
       <div class="studio-layout">
         <section class="panel" aria-labelledby="video-panel-title">
           <div class="panel-header">
@@ -72,11 +78,7 @@
                 </label>
                 <label class="field">
                   <span>Visibility</span>
-                  <select id="privacyLevel">
-                    <option value="SELF_ONLY">Only me</option>
-                    <option value="MUTUAL_FOLLOW_FRIENDS">Friends</option>
-                    <option value="PUBLIC_TO_EVERYONE">Public</option>
-                  </select>
+                  <select id="privacyLevel" required disabled><option value="">Select visibility</option></select>
                 </label>
                 <label class="field">
                   <span>Cover timestamp (seconds)</span>
@@ -84,13 +86,27 @@
                 </label>
 
                 <div class="toggle-grid">
-                  <label class="toggle-card"><span>Allow comments</span><input id="allowComment" type="checkbox" checked /></label>
+                  <label class="toggle-card"><span>Allow comments</span><input id="allowComment" type="checkbox" /></label>
                   <label class="toggle-card"><span>Allow Duet</span><input id="allowDuet" type="checkbox" /></label>
                   <label class="toggle-card"><span>Allow Stitch</span><input id="allowStitch" type="checkbox" /></label>
                   <label class="toggle-card"><span>AI-generated content</span><input id="isAigc" type="checkbox" /></label>
                 </div>
               </div>
 
+              <div class="disclosure-panel">
+                <label class="toggle-card"><span>Disclose commercial content</span><input id="commercial" type="checkbox" /></label>
+                <p>Turn on if this video promotes yourself, a brand, product or service.</p>
+                <div id="brandOptions" hidden>
+                  <label class="toggle-card"><span>Your brand — your own business</span><input id="ownBrand" type="checkbox" /></label>
+                  <label class="toggle-card"><span>Branded content — another brand or third party</span><input id="branded" type="checkbox" /></label>
+                  <p id="brandHint" role="status"></p><p id="brandLabel" role="status"></p>
+                </div>
+              </div>
+              <label class="toggle-card"><span>Send to TikTok Inbox to finish editing and posting in TikTok</span><input id="draftMode" type="checkbox" /></label>
+              <p id="draftNotice" hidden>Only the video is uploaded. Choose the final caption, visibility and disclosure in TikTok. An Inbox delivery is not a published post.</p>
+              <label class="consent-row"><input id="consent" type="checkbox" />
+                <span>I reviewed this video and authorize its upload to the TikTok account shown above. <span id="policyDeclaration"></span></span>
+              </label>
               <ul class="checklist" aria-label="Publication checklist">
                 <li id="checkVideo">A supported video has been selected</li>
                 <li id="checkCaption">A caption has been reviewed</li>
@@ -99,16 +115,15 @@
 
               <div class="action-stack">
                 <button class="button" id="validateButton" type="submit" disabled>Run publication check</button>
-                <a class="button button-secondary" id="connectButton" href="https://tiktok-content-api.onrender.com/tiktok/oauth/start" rel="external">Connect TikTok</a>
-                <button class="button button-secondary" id="creatorButton" type="button" hidden>Read creator information</button>
-                <button class="button button-secondary" id="uploadButton" type="button" hidden>Upload as TikTok draft</button>
-                <button class="button" id="publishButton" type="button" hidden>Publish to TikTok</button>
+                <button class="button" id="publishButton" type="button" disabled>Publish to TikTok</button>
+                <button class="button button-secondary" id="refreshStatus" type="button" hidden>Refresh posting status</button>
+                <button class="button button-secondary" id="newPost" type="button" hidden>Prepare another post</button>
               </div>
               <div class="status-box" id="statusBox" role="status" aria-live="polite">
                 <strong>Waiting for a video</strong>
                 Select a video to begin the review.
               </div>
-              <p class="privacy-note">The selected video is previewed locally. The publication check sends file metadata and post settings to KnowGrow, not the video file. TikTok account connection uses TikTok's official authorization page.</p>
+              <p class="privacy-note">The preview stays on your device. After you confirm, your video is uploaded directly to TikTok. Processing can take a few minutes before the post appears on your profile. Telegram is optional and is not needed to connect, review or publish.</p>
             </form>
           </div>
         </section>
