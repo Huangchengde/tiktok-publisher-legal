@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="api-base" content="https://tiktok-content-api.onrender.com">
+  <meta name="description" content="View your authorized TikTok account's public videos and available engagement counts.">
+  <meta name="referrer" content="no-referrer">
+  <title>My TikTok videos · KnowGrow Creator Studio</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="./library.css">
+  <script type="module" src="./library.mjs"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../"><span class="brand-mark">K</span><span>KnowGrow <small>Creator Studio</small></span></a>
+    <nav class="site-nav" aria-label="Studio navigation">
+      <a href="../app/">Prepare a post</a><a href="./" aria-current="page">My TikTok videos</a><a href="../support/">Support</a>
+    </nav>
+  </header>
+  <main class="library">
+    <div class="library-heading">
+      <p class="eyebrow">Your public videos</p>
+      <h1>My TikTok videos</h1>
+      <p class="lead">Review your published videos and their available engagement counts when planning your next post.</p>
+    </div>
+    <section class="connection-panel" aria-label="TikTok connection">
+      <div class="identity">
+        <img id="avatar" alt="" width="52" height="52" hidden>
+        <div><h2 id="accountName">Connect your TikTok account</h2>
+          <p id="accountHint">You choose whether to share your profile and public videos through TikTok's authorization page.</p></div>
+      </div>
+      <div class="connection-actions">
+        <a id="connect" class="button button-small" hidden href="https://tiktok-content-api.onrender.com/tiktok/videos/oauth/start">Connect TikTok</a>
+        <button id="refresh" class="button button-small button-secondary" disabled>Refresh videos</button>
+        <button id="disconnect" class="quiet-button" hidden>Sign out of video library</button>
+      </div>
+    </section>
+    <div class="results-heading">
+      <h2>Published videos <span id="videoCount"></span></h2>
+      <p id="updated"></p>
+    </div>
+    <p id="status" class="library-status" role="status" aria-live="polite">Checking your connection…</p>
+    <section id="videos" class="video-grid" aria-label="Public TikTok videos" aria-busy="true"></section>
+    <button id="more" class="button button-secondary load-more" hidden>Load more videos</button>
+    <p class="data-note">These are TikTok's cumulative counts. Traffic-source and watch-time analytics are unavailable here. A dash means TikTok did not return that value. Private posts are excluded.</p>
+    <p class="data-note">Sign out removes this website's video-library session. To revoke TikTok access or request data deletion, see <a href="../data-deletion/">Data deletion</a>.</p>
+    <noscript><p>Enable JavaScript to connect your account and load your videos.</p></noscript>
+  </main>
+  <footer class="site-footer"><span>KnowGrow Creator Studio</span><div class="footer-links"><a href="../support/">Support</a><a href="../privacy/">Privacy</a><a href="../data-deletion/">Data deletion</a></div></footer>
+</body>
+</html>
